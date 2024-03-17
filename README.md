@@ -56,3 +56,9 @@ You can run this example with the following command:
 ```
 cargo run --example parse_iss_tle
 ```
+
+To use this crate in a no_std environment, include it in your Cargo.toml file with the following configuration:
+
+```
+tle_parser = { version = "0.x.y", default-features = false }
+```
