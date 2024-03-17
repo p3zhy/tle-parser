@@ -1,4 +1,18 @@
-extern crate nom;
+#![cfg_attr(not(feature = "std"), no_std)]
+
+extern crate alloc;
+
+#[cfg(not(feature = "std"))]
+extern crate core as std;
+#[cfg(feature = "std")]
+extern crate std;
+
+#[cfg(not(feature = "std"))]
+use alloc::{format, string::String};
+
+#[cfg(feature = "std")]
+use std::error;
+use std::fmt;
 
 use nom::{
     bytes::complete::{tag, take, take_until},
@@ -6,8 +20,6 @@ use nom::{
     sequence::tuple,
     IResult,
 };
-use std::error;
-use std::fmt;
 
 #[derive(Debug)]
 pub struct TLEError;
@@ -19,7 +31,7 @@ impl fmt::Display for TLEError {
         write!(f, "Invalid TLE Format")
     }
 }
-
+#[cfg(feature = "std")]
 impl error::Error for TLEError {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         // Generic error, underlying cause isn't tracked.
@@ -170,8 +182,9 @@ pub fn parse(raw_tle: &str) -> Result<TLE> {
             map_res(take(1usize), |i: &str| i.parse::<u32>()),
         )),
     ))(raw_tle)
-    .map_err(|e| {
-        println!("🤔  Error - {}", e);
+    .map_err(|_e| {
+        #[cfg(feature = "std")]
+        println!("🤔  Error - {}", _e);
         TLEError
     })?;
 
